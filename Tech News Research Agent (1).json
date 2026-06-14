@@ -1,0 +1,400 @@
+{
+  "name": "Tech News Research Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            },
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0c2c432c-014a-46ec-8958-dd254d1501d7"
+    },
+    {
+      "parameters": {
+        "maxItems": 8
+      },
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -48
+      ],
+      "id": "b0e06ed1-2bca-4a37-ae50-fea660088866"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=📰 Tech News!\n\n🔖 {{ $json.title }}\n\n🔗 {{ $json.link }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -336
+      ],
+      "id": "fb33db36-c95b-48c1-ad22-9209d3fc200c",
+      "name": "Discord",
+      "webhookId": "8a8b50f1-154a-4db0-a786-815298e30603",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "orHJJu8ca9LEPNdS",
+          "name": "Discord Webhook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://timesofindia.indiatimes.com/rssfeeds/4719148.cms",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -112
+      ],
+      "id": "83a210b0-7c76-4bcd-83b0-73c529f494b6",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "url": "https://timesofindia.indiatimes.com/rssfeedstopstories.cms",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        16
+      ],
+      "id": "f306f384-a9f3-4f78-8987-7d5bb2ec44f7",
+      "name": "RSS Read1"
+    },
+    {
+      "parameters": {
+        "url": "https://timesofindia.indiatimes.com/rssfeeds/7098551.cms",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -224
+      ],
+      "id": "eb389f97-cc80-45c3-93c4-dfbe1cfc1af8",
+      "name": "RSS Read2"
+    },
+    {
+      "parameters": {
+        "url": "https://timesofindia.indiatimes.com/rssfeeds/-2128838597.cms",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        160
+      ],
+      "id": "019f63f0-9a9f-4d7e-add9-c6b5fcfee951",
+      "name": "RSS Read3"
+    },
+    {
+      "parameters": {
+        "url": "https://timesofindia.indiatimes.com/rssfeedmostread.cms",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        304
+      ],
+      "id": "4e3ca542-7321-430d-bbb8-62bebf1e4792",
+      "name": "RSS Read4"
+    },
+    {
+      "parameters": {
+        "url": "https://timesofindia.indiatimes.com/rssfeeds/2950623.cms",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -352
+      ],
+      "id": "c83102c7-3505-4760-8fe3-64b2bb67b87e",
+      "name": "RSS Read5"
+    },
+    {
+      "parameters": {
+        "chatId": "6824414216",
+        "text": "=📰 {{ $json.title }}\n\n🔗 {{ $json.link }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        -48
+      ],
+      "id": "18602850-8394-495f-b721-1a7d0159395e",
+      "name": "Send a text message",
+      "webhookId": "b6e7bcbd-ea87-498a-8c92-036934271f0b",
+      "credentials": {
+        "telegramApi": {
+          "id": "lnTZ1Ca85N3ZhtFr",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://timesofindia.indiatimes.com/rssfeeds/1898055.cms",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -496
+      ],
+      "id": "ca9ef381-7ca1-479e-b639-bb013ffdeb5a",
+      "name": "RSS Read6"
+    },
+    {
+      "parameters": {
+        "url": "https://timesofindia.indiatimes.com/rssfeeds/65857041.cms",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        432
+      ],
+      "id": "eff0d4da-88a1-437d-a332-d21613157f99",
+      "name": "RSS Read7"
+    },
+    {
+      "parameters": {
+        "sendTo": "c2840399@gmail.com",
+        "subject": "Daily Tech News",
+        "message": "={{$json[\"title\"]}}  {{$json[\"link\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        240
+      ],
+      "id": "7570256b-86a0-4c4c-a0c1-a95f32dc494e",
+      "name": "Send a message",
+      "webhookId": "5c48a81a-59a1-474b-91b5-3ec2aa5df46d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "iGFgKZqFftXG8lWG",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read7",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read1": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read2": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read3": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read4": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read5": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "RSS Read6": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read7": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0c48be01-6498-4fb1-b211-144577522957",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ff951e364be48a97f9123c8d5c782d1eef5d3b5f860404ba0973abfda9ca5b6f"
+  },
+  "nodeGroups": [],
+  "id": "VJ3r0yS9d76d397f",
+  "tags": []
+}
