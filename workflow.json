@@ -1,0 +1,243 @@
+{
+  "name": "Lean AI Agent Workflow - Support Triage",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "support-triage",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1a2b3c4d-0001-0001-0001-000000000001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "support-triage-agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "field-001",
+              "name": "customerName",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "field-002",
+              "name": "issueMessage",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "field-003",
+              "name": "priority",
+              "value": "={{ $json.body.priority || 'normal' }}",
+              "type": "string"
+            },
+            {
+              "id": "field-004",
+              "name": "timestamp",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1a2b3c4d-0002-0002-0002-000000000002",
+      "name": "Extract Details",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "model": "gemini-1.5-flash",
+        "options": {},
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a customer support triage AI agent. Analyze the following support message and do these things:\n1. Classify the issue type (Technical, Billing, General, Complaint)\n2. Assess urgency level (Low, Medium, High, Critical)\n3. Write a short summary of the issue\n4. Suggest the best team to handle it\n5. Draft a short reply to the customer\n\nCustomer Name: {{ $json.customerName }}\nPriority Given: {{ $json.priority }}\nMessage: {{ $json.issueMessage }}\n\nRespond in this exact JSON format:\n{\n  \"issueType\": \"\",\n  \"urgency\": \"\",\n  \"summary\": \"\",\n  \"assignTeam\": \"\",\n  \"customerReply\": \"\"\n}"
+            }
+          ]
+        }
+      },
+      "id": "1a2b3c4d-0003-0003-0003-000000000003",
+      "name": "Gemini AI Triage",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-001",
+              "leftValue": "={{ JSON.parse($json.text).urgency }}",
+              "rightValue": "High",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "cond-002",
+              "leftValue": "={{ JSON.parse($json.text).urgency }}",
+              "rightValue": "Critical",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "1a2b3c4d-0004-0004-0004-000000000004",
+      "name": "Check Urgency",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "your-slack-channel-id",
+          "mode": "id"
+        },
+        "text": "=🚨 *URGENT SUPPORT TICKET*\n\n*Customer:* {{ $('Extract Details').item.json.customerName }}\n*Issue Type:* {{ JSON.parse($('Gemini AI Triage').item.json.text).issueType }}\n*Urgency:* {{ JSON.parse($('Gemini AI Triage').item.json.text).urgency }}\n*Assign To:* {{ JSON.parse($('Gemini AI Triage').item.json.text).assignTeam }}\n\n*Summary:*\n{{ JSON.parse($('Gemini AI Triage').item.json.text).summary }}\n\n*Suggested Reply to Customer:*\n{{ JSON.parse($('Gemini AI Triage').item.json.text).customerReply }}\n\n_Received at: {{ $('Extract Details').item.json.timestamp }}_",
+        "otherOptions": {}
+      },
+      "id": "1a2b3c4d-0005-0005-0005-000000000005",
+      "name": "Slack - Urgent Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1120, 180]
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@yourdomain.com",
+        "toEmail": "team@yourdomain.com",
+        "subject": "=New Support Ticket - {{ JSON.parse($('Gemini AI Triage').item.json.text).issueType }} | {{ $('Extract Details').item.json.customerName }}",
+        "emailType": "text",
+        "message": "=New support ticket received.\n\nCustomer: {{ $('Extract Details').item.json.customerName }}\nIssue Type: {{ JSON.parse($('Gemini AI Triage').item.json.text).issueType }}\nUrgency: {{ JSON.parse($('Gemini AI Triage').item.json.text).urgency }}\nAssign To: {{ JSON.parse($('Gemini AI Triage').item.json.text).assignTeam }}\n\nSummary:\n{{ JSON.parse($('Gemini AI Triage').item.json.text).summary }}\n\nSuggested reply to customer:\n{{ JSON.parse($('Gemini AI Triage').item.json.text).customerReply }}\n\nReceived at: {{ $('Extract Details').item.json.timestamp }}",
+        "options": {}
+      },
+      "id": "1a2b3c4d-0006-0006-0006-000000000006",
+      "name": "Gmail - Normal Ticket",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1120, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"received\",\n  \"message\": \"Your support request has been triaged successfully.\",\n  \"ticketSummary\": {{ $('Gemini AI Triage').item.json.text }},\n  \"receivedAt\": \"{{ $('Extract Details').item.json.timestamp }}\"\n}",
+        "options": {}
+      },
+      "id": "1a2b3c4d-0007-0007-0007-000000000007",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Details": {
+      "main": [
+        [
+          {
+            "node": "Gemini AI Triage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini AI Triage": {
+      "main": [
+        [
+          {
+            "node": "Check Urgency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Urgency": {
+      "main": [
+        [
+          {
+            "node": "Slack - Urgent Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail - Normal Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack - Urgent Alert": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Normal Ticket": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "v1.0",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "n8nVersion": "1.0.0"
+  },
+  "id": "lean-ai-agent-workflow-001",
+  "tags": []
+}
