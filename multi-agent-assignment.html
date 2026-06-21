@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Agent Systems – Charan's Assignment</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; line-height: 1.7; }
+
+  .hero {
+    background: linear-gradient(135deg, #1a1f2e 0%, #0f1117 60%);
+    border-bottom: 1px solid #2d3748;
+    padding: 48px 24px 36px;
+    text-align: center;
+  }
+  .hero .badge { display: inline-block; background: #1e3a5f; color: #60a5fa; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; text-transform: uppercase; }
+  .hero h1 { font-size: clamp(22px, 5vw, 36px); font-weight: 700; color: #f8fafc; margin-bottom: 8px; }
+  .hero p { color: #94a3b8; font-size: 14px; }
+  .hero .meta { margin-top: 14px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+  .hero .meta span { font-size: 12px; color: #64748b; }
+  .hero .meta span b { color: #93c5fd; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  .section {
+    background: #1a1f2e;
+    border: 1px solid #2d3748;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .section-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; color: #f1f5f9;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 1px solid #2d3748;
+  }
+  .section-title .icon { font-size: 20px; }
+  .section-num { background: #1e3a5f; color: #60a5fa; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-left: auto; }
+
+  p { color: #cbd5e1; font-size: 14.5px; margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  @media(max-width: 560px) { .compare-grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #0f1117;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .card.blue h3 { color: #60a5fa; }
+  .card.green h3 { color: #34d399; }
+  .card.yellow h3 { color: #fbbf24; }
+  .card.red h3 { color: #f87171; }
+  .card ul { list-style: none; padding: 0; }
+  .card ul li { font-size: 13px; color: #94a3b8; padding: 4px 0; border-bottom: 1px solid #1a1f2e; }
+  .card ul li:last-child { border-bottom: none; }
+  .card ul li::before { content: "→ "; color: #475569; }
+
+  .diagram {
+    background: #0d1117;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    padding: 24px;
+    margin-top: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #94a3b8;
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.6;
+  }
+
+  .flow-steps { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .flow-step {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: #0f1117; border: 1px solid #2d3748;
+    border-radius: 8px; padding: 14px;
+  }
+  .flow-step .step-num {
+    background: #1e3a5f; color: #60a5fa;
+    font-size: 11px; font-weight: 700;
+    min-width: 26px; height: 26px;
+    border-radius: 50%; display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .flow-step h4 { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 4px; }
+  .flow-step p { font-size: 12.5px; color: #94a3b8; margin: 0; }
+
+  .roles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px; }
+  .role-card {
+    background: #0f1117; border: 1px solid #2d3748;
+    border-radius: 10px; padding: 16px; text-align: center;
+  }
+  .role-card .emoji { font-size: 28px; display: block; margin-bottom: 8px; }
+  .role-card h4 { font-size: 13px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+  .role-card p { font-size: 12px; color: #64748b; margin: 0; }
+
+  .code-block {
+    background: #0d1117;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 12.5px;
+    overflow-x: auto;
+  }
+  .code-block .comment { color: #4b5563; }
+  .code-block .keyword { color: #c084fc; }
+  .code-block .string { color: #34d399; }
+  .code-block .func { color: #60a5fa; }
+  .code-block .var { color: #fbbf24; }
+
+  .tool-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+  .tool-table th { background: #0f1117; color: #60a5fa; padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid #2d3748; }
+  .tool-table td { padding: 10px 14px; border-bottom: 1px solid #1a1f2e; color: #94a3b8; vertical-align: top; }
+  .tool-table tr:hover td { background: #0f1117; }
+
+  .output-box {
+    background: #0d1117;
+    border-left: 3px solid #34d399;
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #94a3b8;
+  }
+  .output-box h4 { color: #34d399; font-size: 12px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .note-box {
+    background: #1c1f2a;
+    border: 1px dashed #374151;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #6b7280;
+    font-style: italic;
+  }
+  .note-box::before { content: "📝 My Note: "; color: #fbbf24; font-style: normal; font-weight: 600; }
+
+  .exercise-steps { margin-top: 16px; counter-reset: ex; }
+  .exercise-step {
+    display: flex; gap: 14px; padding: 14px;
+    background: #0f1117; border: 1px solid #2d3748;
+    border-radius: 8px; margin-bottom: 10px;
+    align-items: flex-start;
+  }
+  .exercise-step .ex-num {
+    counter-increment: ex;
+    background: #422006; color: #fb923c;
+    font-size: 11px; font-weight: 700;
+    min-width: 26px; height: 26px;
+    border-radius: 6px; display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .exercise-step h4 { font-size: 13px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
+  .exercise-step p { font-size: 12.5px; color: #94a3b8; margin: 0; }
+
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; margin-right: 4px; }
+  .tag-blue { background: #1e3a5f; color: #60a5fa; }
+  .tag-green { background: #052e16; color: #34d399; }
+  .tag-orange { background: #431407; color: #fb923c; }
+
+  .footer { text-align: center; padding: 24px; font-size: 12px; color: #374151; border-top: 1px solid #1a1f2e; margin-top: 16px; }
+
+  .msg-flow { margin-top: 16px; }
+  .msg { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
+  .msg .from { font-size: 11px; font-weight: 700; min-width: 80px; padding: 4px 8px; border-radius: 6px; text-align: center; flex-shrink: 0; margin-top: 3px; }
+  .msg .bubble { background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; padding: 8px 14px; font-size: 12.5px; color: #94a3b8; flex: 1; }
+  .msg .arrow { color: #374151; padding-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">AI Agent Engineer – Module 5</div>
+  <h1>Single-Agent vs Multi-Agent Systems</h1>
+  <p>Understanding why agents collaborate and how they coordinate</p>
+  <div class="meta">
+    <span>By <b>Charan Poojary</b></span>
+    <span>Vidyavardhini's College of Engineering & Technology</span>
+    <span>edQuest – AI Agent Engineer Program</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="icon">🤖</span>
+      Single-Agent vs Multi-Agent – What's the Difference?
+      <span class="section-num">01</span>
+    </div>
+    <p>
+      When I first started learning about AI agents, I thought one smart agent could just do everything. But as I went deeper, I realized that's like expecting one person to do the job of an entire company. That's where multi-agent systems come in.
+    </p>
+    <p>
+      A <b style="color:#60a5fa">Single-Agent System</b> is exactly what it sounds like – one agent handles everything from start to finish. It's simple, but it breaks down when the task gets complex or too big.
+    </p>
+    <p>
+      A <b style="color:#34d399">Multi-Agent System</b> splits the work between multiple specialized agents that each focus on one thing and coordinate together to reach a shared goal.
+    </p>
+
+    <div class="compare-grid">
+      <div class="card blue">
+        <h3>🔵 Single-Agent</h3>
+        <ul>
+          <li>One agent does everything</li>
+          <li>Simple to set up</li>
+          <li>Good for small tasks</li>
+          <li>Gets overwhelmed at scale</li>
+          <li>Single point of failure</li>
+          <li>No parallelism</li>
+        </ul>
+      </div>
+      <div class="card green">
+        <h3>🟢 Multi-Agent</h3>
+        <ul>
+          <li>Tasks split between agents</li>
+          <li>Each agent is specialized</li>
+          <li>Scales well to complex tasks</li>
+          <li>Agents run in parallel</li>
+          <li>More resilient</li>
+          <li>Better accuracy overall</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note-box">
+      Think of single-agent like a freelancer doing a full project alone vs multi-agent like a startup team where each person has a clear role. The team wins on complex work.
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="icon">🤝</span>
+      Why Do Agents Collaborate?
+      <span class="section-num">02</span>
+    </div>
+    <p>
+      There are a few core reasons why collaboration between agents actually makes sense, especially as tasks get more complex:
+    </p>
+    <div class="compare-grid">
+      <div class="card yellow">
+        <h3>⚡ Parallelism</h3>
+        <ul>
+          <li>Multiple agents work at the same time</li>
+          <li>Drastically cuts total time</li>
+          <li>Like splitting a group project</li>
+        </ul>
+      </div>
+      <div class="card green">
+        <h3>🎯 Specialization</h3>
+        <ul>
+          <li>Each agent is tuned for one job</li>
+          <li>Better quality outputs</li>
+          <li>Easier to debug and improve</li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <h3>🔄 Verification</h3>
+        <ul>
+          <li>One agent checks another's work</li>
+          <li>Reduces hallucinations</li>
+          <li>Built-in quality control</li>
+        </ul>
+      </div>
+      <div class="card red">
+        <h3>📈 Scalability</h3>
+        <ul>
+          <li>Add more agents as needed</li>
+          <li>Modular – easy to upgrade one agent</li>
+          <li>Handles bigger, messier tasks</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="icon">🏗️</span>
+      Multi-Agent System Overview & Core Roles
+      <span class="section-num">03</span>
+    </div>
+    <p>
+      In a typical multi-agent setup, there's a clear structure. At the top is a <b style="color:#fbbf24">Supervisor</b> that understands the overall goal and delegates to specialized <b style="color:#60a5fa">Worker</b> agents. Each worker focuses on its own job and reports back to the supervisor.
+    </p>
+
+    <div class="roles-grid">
+      <div class="role-card">
+        <span class="emoji">🧠</span>
+        <h4>Supervisor Agent</h4>
+        <p>Breaks down the task, delegates to workers, and combines results</p>
+      </div>
+      <div class="role-card">
+        <span class="emoji">🔍</span>
+        <h4>Research Agent</h4>
+        <p>Searches for information from the web or documents</p>
+      </div>
+      <div class="role-card">
+        <span class="emoji">✍️</span>
+        <h4>Summarizer Agent</h4>
+        <p>Takes raw info and condenses it into clean summaries</p>
+      </div>
+      <div class="role-card">
+        <span class="emoji">✅</span>
+        <h4>Verifier Agent</h4>
+        <p>Fact-checks the summary and flags anything that looks wrong</p>
+      </div>
+    </div>
+
+    <div class="diagram">
+                    ┌─────────────────────────┐
+                    │     SUPERVISOR AGENT     │
+                    │   "I know the big goal"  │
+                    └────────────┬────────────┘
+                                 │ delegates tasks
+              ┌──────────────────┼──────────────────┐
+              ▼                  ▼                  ▼
+   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
+   │   RESEARCH   │   │  SUMMARIZER  │   │   VERIFIER   │
+   │    AGENT     │   │    AGENT     │   │    AGENT     │
+   │ "find facts" │   │ "clean it up"│   │ "check it"   │
+   └──────┬───────┘   └──────┬───────┘   └──────┬───────┘
+          │                  │                  │
+          └──────────────────┴──────────────────┘
+                             │ results merged
+                    ┌────────▼────────┐
+                    │   FINAL OUTPUT  │
+                    └─────────────────┘</div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="icon">💬</span>
+      Agent Messaging Flow & Delegation Process
+      <span class="section-num">04</span>
+    </div>
+    <p>
+      One thing that took me a while to understand was how messages actually move between agents. It's not random – there's a clear flow. The supervisor sends structured messages to workers, workers respond with their output, and the supervisor assembles everything.
+    </p>
+
+    <div class="msg-flow">
+      <div class="msg">
+        <div class="from" style="background:#1e3a5f;color:#60a5fa;">USER</div>
+        <div class="arrow">→</div>
+        <div class="bubble">"Research and summarize the latest AI trends in healthcare"</div>
+      </div>
+      <div class="msg">
+        <div class="from" style="background:#1c1f2a;color:#fbbf24;">SUPERVISOR</div>
+        <div class="arrow">→</div>
+        <div class="bubble">Breaks task: (1) Research Agent: find articles → (2) Summarizer: condense → (3) Verifier: check claims</div>
+      </div>
+      <div class="msg">
+        <div class="from" style="background:#0f2a1a;color:#34d399;">RESEARCH</div>
+        <div class="arrow">→</div>
+        <div class="bubble">Returns: raw data from web search – multiple articles about AI diagnostics, drug discovery, wearables</div>
+      </div>
+      <div class="msg">
+        <div class="from" style="background:#1a1535;color:#a78bfa;">SUMMARIZER</div>
+        <div class="arrow">→</div>
+        <div class="bubble">Returns: 3 bullet-point summary of key trends with sources</div>
+      </div>
+      <div class="msg">
+        <div class="from" style="background:#2a1515;color:#f87171;">VERIFIER</div>
+        <div class="arrow">→</div>
+        <div class="bubble">Returns: ✅ 2 claims verified, ⚠️ 1 claim flagged as uncertain – needs better source</div>
+      </div>
+      <div class="msg">
+        <div class="from" style="background:#1c1f2a;color:#fbbf24;">SUPERVISOR</div>
+        <div class="arrow">→</div>
+        <div class="bubble">Merges all outputs, drops flagged claim, formats final response for user</div>
+      </div>
+    </div>
+
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div>
+          <h4>Task Intake</h4>
+          <p>User sends request → Supervisor agent receives and parses the goal</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div>
+          <h4>Decomposition</h4>
+          <p>Supervisor breaks the task into smaller sub-tasks for each worker agent</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div>
+          <h4>Delegation</h4>
+          <p>Structured messages sent to each worker with a clear instruction and context</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div>
+          <h4>Execution</h4>
+          <p>Workers run (possibly in parallel), using their tools to complete sub-tasks</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div>
+          <h4>Aggregation</h4>
+          <p>Supervisor collects all responses and merges into one final output</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="icon">🛠️</span>
+      How Tools Are Used in Agent Systems
+      <span class="section-num">05</span>
+    </div>
+    <p>
+      Agents on their own can only do text reasoning. To actually <i>do things</i> – search the web, read files, call APIs – they need tools. Each agent is given a set of tools it can call, and the LLM decides when to use them.
+    </p>
+
+    <table class="tool-table">
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>Used By</th>
+          <th>What It Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-blue">web_search</span></td>
+          <td>Research Agent</td>
+          <td>Searches Google/Bing for real-time information</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-green">read_document</span></td>
+          <td>Research Agent</td>
+          <td>Reads PDFs, text files, or uploaded documents</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-blue">summarize_text</span></td>
+          <td>Summarizer Agent</td>
+          <td>Condenses long text into key points</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-orange">fact_check</span></td>
+          <td>Verifier Agent</td>
+          <td>Cross-references claims with trusted sources</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-green">send_message</span></td>
+          <td>Supervisor Agent</td>
+          <td>Sends delegation messages to worker agents</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-blue">merge_outputs</span></td>
+          <td>Supervisor Agent</td>
+          <td>Combines multiple agent responses into one final answer</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note-box">
+      I learned that tools are basically what make agents actually useful beyond just chatting. Without tools, an agent is just a fancy autocomplete. Tools are what connect agents to the real world.
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="icon">🔁</span>
+      Collaborative Workflow – Full Example
+      <span class="section-num">06</span>
+    </div>
+    <p>
+      Here's a real walkthrough of how a multi-agent system would work if I asked it to <b style="color:#f1f5f9">"Research AI in healthcare and give me a verified summary."</b>
+    </p>
+
+    <div class="code-block">
+<span class="comment"># Simplified Python-style pseudocode showing how agents coordinate</span>
+
+<span class="keyword">class</span> <span class="func">SupervisorAgent</span>:
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="var">self</span>, user_query):
+        <span class="comment"># Step 1: decompose the task</span>
+        <span class="var">tasks</span> = <span class="var">self</span>.decompose(user_query)
+        <span class="comment"># → ["research AI healthcare trends", "summarize findings", "verify claims"]</span>
+
+        <span class="comment"># Step 2: delegate to workers</span>
+        <span class="var">raw_data</span>   = ResearchAgent().run(<span class="string">"AI healthcare trends 2025"</span>)
+        <span class="var">summary</span>    = SummarizerAgent().run(<span class="var">raw_data</span>)
+        <span class="var">verified</span>   = VerifierAgent().run(<span class="var">summary</span>)
+
+        <span class="comment"># Step 3: merge and return</span>
+        <span class="keyword">return</span> <span class="var">self</span>.merge(<span class="var">verified</span>)
+
+
+<span class="keyword">class</span> <span class="func">ResearchAgent</span>:
+    <span class="var">tools</span> = [<span class="string">"web_search"</span>, <span class="string">"read_document"</span>]
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="var">self</span>, query):
+        <span class="keyword">return</span> web_search(query)   <span class="comment"># returns raw articles</span>
+
+
+<span class="keyword">class</span> <span class="func">SummarizerAgent</span>:
+    <span class="var">tools</span> = [<span class="string">"summarize_text"</span>]
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="var">self</span>, data):
+        <span class="keyword">return</span> summarize_text(data)  <span class="comment"># 3 key bullets</span>
+
+
+<span class="keyword">class</span> <span class="func">VerifierAgent</span>:
+    <span class="var">tools</span> = [<span class="string">"fact_check"</span>]
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="var">self</span>, summary):
+        <span class="keyword">return</span> fact_check(summary)   <span class="comment"># flags uncertain claims</span>
+    </div>
+
+    <div class="output-box">
+      <h4>✅ Sample Final Output</h4>
+      <b style="color:#e2e8f0">Verified AI Healthcare Summary:</b><br><br>
+      1. AI diagnostics can detect diseases like cancer earlier than traditional methods (verified ✅)<br>
+      2. Drug discovery using AI has reduced testing time by up to 40% (verified ✅)<br>
+      3. AI-powered wearables are being tested in real-time patient monitoring (source uncertain ⚠️ – removed)<br><br>
+      <span style="color:#64748b;font-size:12px">Generated by 3-agent pipeline: Research → Summarize → Verify</span>
+    </div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="icon">🧪</span>
+      Hands-On Exercise – Build Your Own Mini Pipeline
+      <span class="section-num">07</span>
+    </div>
+    <p>
+      Here's a hands-on exercise to try this yourself. You can do this with n8n, LangChain, or just plain Python. The goal is to build a simple 3-agent pipeline that researches, summarizes, and verifies any topic you give it.
+    </p>
+
+    <div class="exercise-steps">
+      <div class="exercise-step">
+        <div class="ex-num">1</div>
+        <div>
+          <h4>Set Up Your Supervisor</h4>
+          <p>Create a main agent/workflow that accepts a user query and knows it has to delegate 3 tasks. In n8n, this is your first node after the webhook trigger.</p>
+        </div>
+      </div>
+      <div class="exercise-step">
+        <div class="ex-num">2</div>
+        <div>
+          <h4>Build the Research Agent</h4>
+          <p>Give it a web search tool. In n8n you can use the HTTP Request node to call a search API (like Serper or Tavily). In Python, use <code style="color:#34d399">requests</code> + any search API.</p>
+        </div>
+      </div>
+      <div class="exercise-step">
+        <div class="ex-num">3</div>
+        <div>
+          <h4>Build the Summarizer Agent</h4>
+          <p>Pass the raw search results into Gemini or GPT with a prompt like: <i>"Summarize the following into 3 key points."</i> In n8n, this is a Google Gemini node.</p>
+        </div>
+      </div>
+      <div class="exercise-step">
+        <div class="ex-num">4</div>
+        <div>
+          <h4>Build the Verifier Agent</h4>
+          <p>Send the summary back into AI with a prompt: <i>"Check each point. Mark as Verified ✅ or Uncertain ⚠️."</i> This is just another AI node with a different system prompt.</p>
+        </div>
+      </div>
+      <div class="exercise-step">
+        <div class="ex-num">5</div>
+        <div>
+          <h4>Merge & Output</h4>
+          <p>The supervisor collects all outputs and combines them. In n8n, use a Merge node or a final AI node that combines everything into a clean final response. Send it to Slack, Gmail, or just display it.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      I actually built something like this when I made my Tech News Research Agent in n8n. The structure is the same – RSS → Gemini → Format → Output. The idea of agents is just taking that same pattern and making each step smarter and more independent.
+    </div>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="icon">🎬</span>
+      Tool Use-Case Demo – News Research Agent
+      <span class="section-num">08</span>
+    </div>
+    <p>
+      As a mini demo, here's how a real multi-agent news research pipeline would work using tools at each step. This is based on what I built in n8n, now described as an agent system:
+    </p>
+
+    <div class="diagram">
+ USER INPUT: "Give me a verified summary of today's AI news"
+ 
+ ┌─────────────────────────────────────────────────────────┐
+ │  SUPERVISOR AGENT                                        │
+ │  Goal: research → summarize → verify → deliver          │
+ └───────────────────────┬─────────────────────────────────┘
+                         │
+         ┌───────────────┼───────────────┐
+         ▼               ▼               ▼
+ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+ │  RESEARCH    │ │  SUMMARIZER  │ │  VERIFIER    │
+ │  AGENT       │ │  AGENT       │ │  AGENT       │
+ │              │ │              │ │              │
+ │ Tool:        │ │ Tool:        │ │ Tool:        │
+ │ rss_feed     │ │ gemini_api   │ │ gemini_api   │
+ │ web_search   │ │ summarize()  │ │ fact_check() │
+ │              │ │              │ │              │
+ │ Output:      │ │ Output:      │ │ Output:      │
+ │ 5 raw news   │ │ 3 key points │ │ Verified ✅  │
+ │ articles     │ │              │ │ Flagged ⚠️   │
+ └──────────────┘ └──────────────┘ └──────────────┘
+         │               │               │
+         └───────────────┴───────────────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │   FINAL OUTPUT       │
+              │   Sent to: Slack /   │
+              │   Gmail / Dashboard  │
+              └──────────────────────┘</div>
+
+    <div class="output-box">
+      <h4>🟢 What this demo proves</h4>
+      Each agent does <b>one job</b>, uses its <b>own tool</b>, and passes results forward. The supervisor never needs to know HOW each agent does its job — just what it returns. That separation is the whole power of multi-agent architecture.
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="section" style="border-color:#1e3a5f;">
+    <div class="section-title">
+      <span class="icon">📌</span>
+      Key Takeaways
+    </div>
+    <div class="compare-grid">
+      <div class="card blue">
+        <h3>What I learned</h3>
+        <ul>
+          <li>Multi-agent = divide and specialize</li>
+          <li>Supervisor-Worker is the core pattern</li>
+          <li>Tools connect agents to real actions</li>
+          <li>Messages flow in structured formats</li>
+          <li>Verification = built-in quality control</li>
+        </ul>
+      </div>
+      <div class="card green">
+        <h3>When to use multi-agent</h3>
+        <ul>
+          <li>Task is too big for one agent</li>
+          <li>Need parallel processing</li>
+          <li>Different steps need different tools</li>
+          <li>Quality matters (need verification)</li>
+          <li>Building something scalable</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Charan Poojary · AI Agent Engineer Program · Vidyavardhini's College of Engineering & Technology · 2025–26
+</div>
+
+</body>
+</html>
