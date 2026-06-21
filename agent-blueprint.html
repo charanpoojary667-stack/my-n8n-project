@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced Agent System Blueprint</title>
+<style>
+  :root{
+    --ink:#1b1f23;
+    --paper:#faf8f4;
+    --line:#d8d2c4;
+    --accent:#b5552b;
+    --accent2:#2f5d50;
+    --muted:#6b6458;
+    --box:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Georgia','Iowan Old Style',serif;
+    line-height:1.5;
+  }
+  .mono{font-family:'JetBrains Mono','Courier New',monospace;}
+  header{
+    padding:56px 8vw 36px; border-bottom:3px solid var(--ink);
+  }
+  header .eyebrow{
+    font-family:'JetBrains Mono','Courier New',monospace;
+    letter-spacing:.15em; text-transform:uppercase; font-size:12px; color:var(--accent);
+  }
+  h1{font-size:42px; margin:10px 0 8px; letter-spacing:-0.01em;}
+  header p{color:var(--muted); max-width:680px; font-size:16px;}
+  main{padding:0 8vw 80px;}
+  section{padding:48px 0; border-bottom:1px solid var(--line);}
+  section:last-child{border-bottom:none;}
+  .num{
+    font-family:'JetBrains Mono','Courier New',monospace;
+    color:var(--accent); font-size:13px; letter-spacing:.1em;
+  }
+  h2{font-size:26px; margin:6px 0 18px;}
+  h3{font-size:17px; margin:0 0 10px; color:var(--accent2);}
+  p{max-width:760px;}
+  .grid{display:grid; gap:18px;}
+  .grid-2{grid-template-columns:1fr 1fr;}
+  .grid-3{grid-template-columns:1fr 1fr 1fr;}
+  @media (max-width:800px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+  .card{
+    background:var(--box); border:1px solid var(--line); border-radius:4px;
+    padding:18px 20px;
+  }
+  .card h4{margin:0 0 8px; font-size:14px; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.05em; color:var(--accent);}
+  .card p, .card ul{margin:0; font-size:14.5px; color:#2a2a2a;}
+  ul{padding-left:20px;}
+  /* diagram */
+  .flow{
+    display:flex; align-items:stretch; gap:0; flex-wrap:wrap; margin:24px 0;
+  }
+  .node{
+    background:var(--box); border:1.5px solid var(--ink); border-radius:6px;
+    padding:14px 16px; font-size:13.5px; min-width:140px; text-align:center;
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .node b{display:block; font-size:14px; margin-bottom:2px;}
+  .node small{color:var(--muted); font-size:11.5px;}
+  .arrow{
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; color:var(--accent); min-width:34px; font-weight:bold;
+  }
+  .accent-node{border-color:var(--accent); background:#fdf3ec;}
+  .accent2-node{border-color:var(--accent2); background:#eef4f1;}
+  .stack{display:flex; flex-direction:column; gap:0;}
+  .stack .arrow{transform:rotate(90deg); padding:2px 0;}
+  .legend{font-size:12px; color:var(--muted); margin-top:6px;}
+  table{width:100%; border-collapse:collapse; font-size:14px; margin-top:10px;}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:left;}
+  th{background:#f1ede4; font-family:'JetBrains Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:.04em;}
+  .tag{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px;
+    background:var(--ink); color:var(--paper); padding:2px 8px; border-radius:3px; margin-right:6px;
+  }
+  .scenario{border-left:4px solid var(--accent2); padding-left:18px; margin-bottom:28px;}
+  .scenario h3{margin-bottom:4px;}
+  .scenario .role{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); margin-bottom:10px; display:block;}
+  footer{padding:30px 8vw; text-align:center; color:var(--muted); font-size:13px; border-top:3px solid var(--ink);}
+  @media print{
+    section{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">AI Agent Engineer · Advanced Agent Systems</div>
+  <h1>End-to-End Advanced Agent System Blueprint</h1>
+  <p>A complete map of how a production AI agent goes from raw files to grounded answers — covering retrieval, memory, cost control, and real deployment patterns.</p>
+</header>
+
+<main>
+
+  <!-- 1. OVERVIEW -->
+  <section>
+    <div class="num">01 — System Overview</div>
+    <h2>What an advanced agent actually is</h2>
+    <p>An advanced agent is not just a chat model. It's a model wrapped with <b>tools</b> (functions it can call), a <b>retrieval layer</b> (knowledge it can search), and <b>memory</b> (context it carries across turns and sessions) — all coordinated by a control loop that decides what to do next.</p>
+
+    <div class="flow">
+      <div class="node accent-node"><b>User Input</b><small>message / file / event</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Orchestrator</b><small>planning + routing loop</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Tools</b><small>search, calc, API calls</small></div>
+      <div class="arrow">→</div>
+      <div class="node accent2-node"><b>RAG / Memory</b><small>retrieved context</small></div>
+      <div class="arrow">→</div>
+      <div class="node accent-node"><b>Response</b><small>grounded answer</small></div>
+    </div>
+    <p class="legend">The orchestrator loop repeats: think → act (tool/retrieval) → observe → respond, until it has enough grounded context to answer.</p>
+
+    <h3 style="margin-top:28px;">Why agents use tools</h3>
+    <div class="grid grid-3">
+      <div class="card"><h4>Knowledge gaps</h4><p>LLMs freeze at a training cutoff. Tools (search, DB lookups, RAG) bring in current or private data the model never saw.</p></div>
+      <div class="card"><h4>Precision tasks</h4><p>Math, code execution, and structured lookups are unreliable when "guessed" in text — a calculator or interpreter tool is exact.</p></div>
+      <div class="card"><h4>Taking action</h4><p>Booking, sending, updating a record — tools let the agent act on the world, not just describe what should happen.</p></div>
+    </div>
+  </section>
+
+  <!-- 2. RAG PIPELINE -->
+  <section>
+    <div class="num">02 — RAG Pipeline & Retrieval Flow</div>
+    <h2>How the agent retrieves and uses knowledge</h2>
+    <p>RAG (Retrieval-Augmented Generation) has two halves: an <b>indexing pipeline</b> that runs once per document, and a <b>retrieval flow</b> that runs on every query.</p>
+
+    <h3>Indexing (offline, one-time per file)</h3>
+    <div class="flow">
+      <div class="node"><b>1. Ingest</b><small>upload / crawl</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>2. Parse</b><small>extract text/tables</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>3. Chunk</b><small>~300–800 tokens</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>4. Embed</b><small>vector encoding</small></div>
+      <div class="arrow">→</div>
+      <div class="node accent2-node"><b>5. Vector Store</b><small>+ metadata index</small></div>
+    </div>
+
+    <h3 style="margin-top:30px;">Retrieval (live, per user query)</h3>
+    <div class="flow">
+      <div class="node accent-node"><b>Query</b></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Rewrite / Expand</b><small>clarify intent</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Embed Query</b></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Vector Search</b><small>top-k chunks</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Re-rank</b><small>relevance filter</small></div>
+      <div class="arrow">→</div>
+      <div class="node accent2-node"><b>Inject into Prompt</b><small>+ citations</small></div>
+      <div class="arrow">→</div>
+      <div class="node accent-node"><b>LLM Answer</b></div>
+    </div>
+    <p class="legend">Re-ranking matters: vector similarity finds "topically close" chunks, but a re-ranker filters for chunks that actually answer the question — this is what keeps hallucination down.</p>
+  </section>
+
+  <!-- 3. FILE PIPELINE -->
+  <section>
+    <div class="num">03 — File Pipelines</div>
+    <h2>How files are ingested and processed</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h4>Stage 1 — Intake</h4>
+        <ul>
+          <li>Validate file type & size</li>
+          <li>Virus/malware scan</li>
+          <li>Store raw file in object storage</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Stage 2 — Extraction</h4>
+        <ul>
+          <li>PDF/DOCX → text via parser or OCR</li>
+          <li>Tables kept as structured data, not flattened text</li>
+          <li>Images captioned or embedded separately</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Stage 3 — Chunking & Embedding</h4>
+        <ul>
+          <li>Split by semantic section, not fixed length alone</li>
+          <li>Attach metadata: source, page, date, owner</li>
+          <li>Embed and write to vector index</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Stage 4 — Lifecycle</h4>
+        <ul>
+          <li>Versioning: re-index on file update</li>
+          <li>Expiry/deletion policy for stale or removed docs</li>
+          <li>Access control tags carried into retrieval filters</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. MEMORY -->
+  <section>
+    <div class="num">04 — Memory Architecture</div>
+    <h2>Short-term vs. long-term memory</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h4>Short-term (working) memory</h4>
+        <p>Lives in the active context window. Holds the current conversation turns, recent tool outputs, and the immediate task state. Cleared or summarized when the session ends.</p>
+      </div>
+      <div class="card">
+        <h4>Long-term memory</h4>
+        <p>Persists across sessions in an external store (vector DB or key-value store). Holds user preferences, prior decisions, and durable facts — pulled in only when relevant, not loaded by default.</p>
+      </div>
+    </div>
+
+    <div class="flow" style="margin-top:24px;">
+      <div class="node accent-node"><b>Conversation Turn</b></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Short-Term Buffer</b><small>last N turns</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Summarizer</b><small>compress old turns</small></div>
+      <div class="arrow">→</div>
+      <div class="node accent2-node"><b>Long-Term Store</b><small>facts, preferences</small></div>
+    </div>
+    <p class="legend">When the buffer fills up, old turns get summarized into a compact note and written to long-term memory — keeping token usage flat while preserving important context.</p>
+  </section>
+
+  <!-- 5. COST CONTROL -->
+  <section>
+    <div class="num">05 — Cost Control Patterns</div>
+    <h2>Controlling latency and token spend</h2>
+    <table>
+      <tr><th>Pattern</th><th>What it does</th><th>Saves</th></tr>
+      <tr><td>Prompt caching</td><td>Reuse cached system prompt / static context across calls</td><td>Token cost, latency</td></tr>
+      <tr><td>Model routing</td><td>Send simple queries to a small/cheap model, complex ones to a larger model</td><td>Cost</td></tr>
+      <tr><td>Selective retrieval</td><td>Only retrieve when the query actually needs external knowledge</td><td>Latency, tokens</td></tr>
+      <tr><td>Chunk limiting (top-k)</td><td>Cap retrieved chunks to the smallest set that answers the query</td><td>Tokens</td></tr>
+      <tr><td>Response streaming</td><td>Stream tokens to the user instead of waiting for full generation</td><td>Perceived latency</td></tr>
+      <tr><td>Memory summarization</td><td>Compress old conversation instead of resending full history</td><td>Tokens</td></tr>
+      <tr><td>Batching</td><td>Group non-urgent tasks (e.g. indexing) into batch jobs</td><td>Cost</td></tr>
+    </table>
+  </section>
+
+  <!-- 6. PRODUCTION SCENARIOS -->
+  <section>
+    <div class="num">06 — Production Use Cases</div>
+    <h2>How it comes together in practice</h2>
+
+    <div class="scenario">
+      <h3>Customer Support Agent</h3>
+      <span class="role"><span class="tag">RAG</span><span class="tag">Tools</span><span class="tag">Memory</span></span>
+      <p>User uploads a product manual PDF. The file pipeline parses and chunks it into the vector store. On each question, the agent retrieves relevant manual chunks, calls a lookup tool for order status, and uses short-term memory to track the conversation. Cost control: cached system prompt + selective retrieval (only search the manual when the question isn't a simple FAQ).</p>
+    </div>
+
+    <div class="scenario">
+      <h3>Research Assistant</h3>
+      <span class="role"><span class="tag">RAG</span><span class="tag">Web Search Tool</span><span class="tag">Long-term Memory</span></span>
+      <p>Agent indexes a set of papers, retrieves relevant passages per question, and calls a web-search tool for anything not in the local index. Findings and user preferences (preferred citation style, topics of interest) are written to long-term memory so future sessions skip re-explaining context. Cost control: model routing — quick fact lookups go to a small model, synthesis goes to a larger one.</p>
+    </div>
+
+    <div class="scenario">
+      <h3>Document Analysis Agent</h3>
+      <span class="role"><span class="tag">File Pipeline</span><span class="tag">RAG</span><span class="tag">Summarization Tool</span></span>
+      <p>Agent ingests a batch of contracts, extracts tables and clauses during the file pipeline, indexes each by clause type, and retrieves matching clauses across documents on request. A summarization tool condenses long sections before they enter the prompt. Cost control: top-k chunk limiting and batch indexing during off-peak hours.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>Advanced Agent System Blueprint — Optimization & Production Applications</footer>
+
+</body>
+</html>
